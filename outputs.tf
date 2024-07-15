@@ -2,10 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Outputs file
-output "catapp_url" {
-  value = "http://${google_compute_instance.hashicat.network_interface.0.access_config.0.nat_ip}"
+output "google_compute_network" {
+  value = google_compute_network.hashicat.name
 }
 
-output "catapp_ip" {
-  value = "http://${google_compute_instance.hashicat.network_interface.0.network_ip}"
+output "google_compute_subnetwork_hashicat_self_link" {
+  value = google_compute_subnetwork.hashicat.self_link
+}
+
+output "google_compute_firewall" {
+  value = google_compute_firewall.http-server.id
 }
