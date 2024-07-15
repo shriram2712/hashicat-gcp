@@ -15,30 +15,9 @@ provider "google" {
   region  = var.region
 }
 
-resource "google_compute_network" "hashicat" {
-  name                    = "${var.prefix}-vpc-${var.region}"
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "hashicat" {
-  name          = "${var.prefix}-subnet"
-  region        = var.region
-  network       = google_compute_network.hashicat.self_link
-  ip_cidr_range = var.subnet_prefix
-}
-
-resource "google_compute_firewall" "http-server" {
-  name    = "${var.prefix}-default-allow-ssh-http"
-  network = google_compute_network.hashicat.self_link
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22", "80"]
-  }
-
-  // Allow traffic from everywhere to instances with an http-server tag
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["http-server"]
+data "tfe_outputs" "network-outputs"{
+  organization = var.organization
+  workspace = var.workspace
 }
 
 resource "tls_private_key" "ssh-key" {
@@ -57,7 +36,7 @@ resource "google_compute_instance" "hashicat" {
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.hashicat.self_link
+    subnetwork = data.tfe_outputs.network-outputs.values.google_compute_subnetwork_hashicat_self_link
     access_config {
     }
   }
